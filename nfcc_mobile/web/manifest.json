@@ -1,11 +1,11 @@
 {
-    "name": "nfcc_mobile",
-    "short_name": "nfcc_mobile",
+    "name": "NFCC",
+    "short_name": "NFCC",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#000000",
+    "theme_color": "#00B0FF",
+    "description": "NFC-triggered automations, habit tracking and daily TODOs.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
