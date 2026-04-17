@@ -1,0 +1,50 @@
+name: iOS (unsigned)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'nfcc_mobile/**'
+      - '.github/workflows/ios.yml'
+  pull_request:
+    paths:
+      - 'nfcc_mobile/**'
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    name: Build unsigned iOS .app
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: nfcc_mobile
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter --version
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build iOS (no codesign, no tree-shake)
+        run: flutter build ios --release --no-codesign --no-tree-shake-icons
+
+      - name: Package .app into zip
+        run: |
+          cd build/ios/iphoneos
+          zip -r NFCC-Runner.app.zip Runner.app
+          mv NFCC-Runner.app.zip $GITHUB_WORKSPACE/NFCC-Runner.app.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nfcc-ios-unsigned
+          path: NFCC-Runner.app.zip
+          if-no-files-found: error

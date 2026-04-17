@@ -1,0 +1,54 @@
+name: PC Companion (Windows)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'nfcc_pc/**'
+      - '.github/workflows/pc-windows.yml'
+  pull_request:
+    paths:
+      - 'nfcc_pc/**'
+  workflow_dispatch:
+  release:
+    types: [created]
+
+jobs:
+  build-exe:
+    name: Build Windows EXE
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: nfcc_pc
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: nfcc_pc/requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build EXE with PyInstaller
+        run: pyinstaller --noconfirm --onefile --windowed --name "NFCC-Companion" main.py
+        shell: cmd
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nfcc-companion-windows
+          path: nfcc_pc/dist/NFCC-Companion.exe
+          if-no-files-found: error
+
+      - name: Attach EXE to GitHub release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: nfcc_pc/dist/NFCC-Companion.exe

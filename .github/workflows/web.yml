@@ -1,0 +1,67 @@
+name: Flutter Web Preview
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'nfcc_mobile/**'
+      - '.github/workflows/web.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build Flutter web preview
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: nfcc_mobile
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Set up sqflite web worker
+        run: dart run sqflite_common_ffi_web:setup
+        continue-on-error: true
+
+      - name: Build web (release, no tree-shake)
+        run: |
+          flutter build web \
+            --release \
+            --no-tree-shake-icons \
+            --target=lib/main_web.dart \
+            --base-href=/nfcc/
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: nfcc_mobile/build/web
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
