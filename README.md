@@ -87,6 +87,7 @@ npm install && npm run dev
 - [Architecture overview](docs/ARCHITECTURE.md) — how phone, PC, and tag talk to each other
 - [User guide](docs/USER_GUIDE.md) — routines, tracking, TODOs, tag pairing
 - [NFC data format](docs/NFC_DATA_FORMAT.md) — what's written to a tag
+- [Publishing to F-Droid](docs/FDROID.md) — submission steps for `fdroiddata`
 - [Contributing](CONTRIBUTING.md)
 
 ## 🤝 Contributing

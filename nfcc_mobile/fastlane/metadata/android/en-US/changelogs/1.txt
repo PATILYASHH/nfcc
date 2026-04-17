@@ -1,0 +1,8 @@
+First public release.
+
+• Routines: IF/ELSE automations with 28 phone actions
+• Tracking: counters and IN/OUT toggles, one tag → many logs
+• TODOs: daily/one-off with streaks and optional reminder time
+• NFC Writer: URL, Wi-Fi, text, phone, SMS, email, location (map), app launcher, UPI
+• Optional PC companion over local Wi-Fi (32 extra desktop actions)
+• Local-only, no cloud, MIT licensed

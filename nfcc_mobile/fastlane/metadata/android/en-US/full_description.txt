@@ -1,0 +1,32 @@
+NFCC turns a cheap NFC sticker into a universal remote for your phone — and, optionally, your computer. One tap can toggle phone state, launch apps, log a glass of water, clock in at work, or tick off a daily TODO. The same tag can do all of that at once.
+
+Everything runs locally. No cloud account, no subscription, no tracking. Your data stays on your device in a local SQLite database.
+
+FEATURES
+
+• Routines — IF/ELSE automations that evaluate time, weekday, Wi-Fi SSID, and Bluetooth state. 28 phone actions built in.
+
+• Tracking — counters (water, coffee, calories, reps) and state-aware IN/OUT toggles (home, office, gym). Each tap increments a counter or flips a state. Daily goals and progress rings included.
+
+• TODOs — daily tasks with streak tracking (🔥 don't break the chain) or one-off tasks. Optional reminder time per task.
+
+• One tag, many jobs — a single tag can fire a routine, log multiple trackers, and complete several TODOs in a single tap.
+
+• NFC Writer — write URLs, Wi-Fi credentials, phone numbers, SMS, email, location (pick on map), app launchers and UPI payment links to your tags.
+
+• Samsung-inspired dark UI — minimal, one-handed friendly, haptic feedback on every tap.
+
+OPTIONAL DESKTOP COMPANION
+
+Pair with the free NFC Control companion app for Windows (source: https://github.com/PATILYASHH/nfcc) over your local Wi-Fi — using a QR code — to extend 32 more actions to your PC: launch apps, lock workstation, control media, resize windows, type keystrokes, take screenshots and more. All traffic stays on your LAN.
+
+PERMISSIONS
+
+• NFC — read and write NFC tags.
+• Location (coarse) — Android requires this to read the Wi-Fi SSID for automation conditions. The app does not send location anywhere.
+• Bluetooth — detect paired Bluetooth devices for automation conditions.
+• Camera — scan the pairing QR code for the PC companion.
+• Internet — local Wi-Fi only (WebSocket to the paired PC).
+• Query all packages — list installed apps for the "Launch app" action.
+
+Free and open source, MIT licensed.

@@ -1,0 +1,62 @@
+# F-Droid build recipe — TEMPLATE
+#
+# This file is NOT read by any build here. It is a ready-to-submit copy of
+# what goes into the fdroiddata repository when requesting inclusion in the
+# official F-Droid repo. See docs/FDROID.md for the submission flow.
+#
+# After submission, the canonical copy lives at:
+#   https://gitlab.com/fdroid/fdroiddata/-/blob/master/metadata/com.nfccontrol.nfcc_mobile.yml
+
+Categories:
+  - System
+  - Connectivity
+License: MIT
+AuthorName: Yash Patil
+AuthorWebSite: https://yashpatil.vercel.app
+WebSite: https://patilyashh.github.io/nfcc/
+SourceCode: https://github.com/PATILYASHH/nfcc
+IssueTracker: https://github.com/PATILYASHH/nfcc/issues
+Changelog: https://github.com/PATILYASHH/nfcc/releases
+
+AutoName: NFCC
+Description: |-
+  NFCC turns an NFC tag into a universal remote. One tap can fire a routine,
+  log habits (water, coffee, IN/OUT), complete daily TODOs, and — with the
+  optional PC companion — launch apps, control media or lock your workstation.
+
+  All data stays on the device. No cloud, no account, no tracking.
+
+RepoType: git
+Repo: https://github.com/PATILYASHH/nfcc
+
+Builds:
+  - versionName: 1.0.0
+    versionCode: 1
+    commit: v1.0.0
+    subdir: nfcc_mobile
+    sudo:
+      - apt-get update
+      - apt-get install -y openjdk-17-jdk-headless
+      - update-java-alternatives -a
+    gradle:
+      - yes
+    srclibs:
+      - flutter@3.38.9
+    rm:
+      - nfcc_mobile/.metadata
+    scandelete:
+      - nfcc_mobile/pubspec.lock
+    prebuild:
+      - export PUB_CACHE="$$PWD$$/.pub-cache"
+      - $$flutter$$/bin/flutter config --no-analytics
+      - $$flutter$$/bin/flutter pub get
+    build:
+      - export PUB_CACHE="$$PWD$$/.pub-cache"
+      - $$flutter$$/bin/flutter build apk --release --no-tree-shake-icons
+    output: build/app/outputs/flutter-apk/app-release.apk
+    ndk: r27c
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: 1.0.0
+CurrentVersionCode: 1

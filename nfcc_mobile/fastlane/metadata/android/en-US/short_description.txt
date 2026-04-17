@@ -1,0 +1,1 @@
+NFC-triggered automations, habit tracking and daily TODOs.
