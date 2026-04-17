@@ -63,11 +63,8 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install fdroidserver
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y fdroidserver
-        continue-on-error: true
+      - name: Install PyYAML
+        run: pip install pyyaml
 
       - name: Lint .fdroid/ metadata (YAML sanity)
         shell: bash
