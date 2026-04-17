@@ -11,7 +11,10 @@ on:
       - 'nfcc_pc/**'
   workflow_dispatch:
   release:
-    types: [created]
+    types: [created, published]
+
+permissions:
+  contents: write
 
 jobs:
   build-exe:
