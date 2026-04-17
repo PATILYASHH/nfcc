@@ -36,6 +36,21 @@ class SilentExecutor {
       await _db.incrementTagScan(uid);
     }
 
+    // ── Resolve tracker/todo bindings written as NDEF (cross-install) ──
+    // Writing a tag from the Tracker/TODO screens stores NFCC_T:<id> or
+    // NFCC_D:<id> as NDEF. On first tap after a fresh install we use that
+    // to auto-add the tag UID to the entity's tag list, so subsequent
+    // UID-based dispatch picks it up.
+    if (ndefText != null) {
+      if (ndefText.startsWith('NFCC_T:')) {
+        final id = int.tryParse(ndefText.substring(7));
+        if (id != null) await _ensureTrackerTag(id, uid);
+      } else if (ndefText.startsWith('NFCC_D:')) {
+        final id = int.tryParse(ndefText.substring(7));
+        if (id != null) await _ensureTodoTag(id, uid);
+      }
+    }
+
     // ── Dispatch trackers + todos bound to this tag (can be many) ──
     final trackerSummary = await _dispatchTrackers(uid);
     final todoSummary = await _dispatchTodos(uid);
@@ -242,6 +257,36 @@ class SilentExecutor {
 
   String _fmt(double v) =>
       v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toStringAsFixed(1);
+
+  /// When a tag was written with NFCC_T:<id> but its UID isn't yet in the
+  /// tracker's binding list, add it. Idempotent.
+  Future<void> _ensureTrackerTag(int trackerId, String uid) async {
+    try {
+      final t = await _db.getTrackerById(trackerId);
+      if (t == null || t.tagUids.contains(uid)) return;
+      await _db.updateTracker(t.copyWith(
+        tagUids: [...t.tagUids, uid],
+        updatedAt: DateTime.now(),
+      ));
+      debugPrint('NFCC: Auto-bound tag $uid to tracker ${t.name}');
+    } catch (e) {
+      debugPrint('NFCC: _ensureTrackerTag error: $e');
+    }
+  }
+
+  Future<void> _ensureTodoTag(int todoId, String uid) async {
+    try {
+      final t = await _db.getTodoById(todoId);
+      if (t == null || t.tagUids.contains(uid)) return;
+      await _db.updateTodo(t.copyWith(
+        tagUids: [...t.tagUids, uid],
+        updatedAt: DateTime.now(),
+      ));
+      debugPrint('NFCC: Auto-bound tag $uid to todo ${t.name}');
+    } catch (e) {
+      debugPrint('NFCC: _ensureTodoTag error: $e');
+    }
+  }
 
   /// Foreground tap: dispatches trackers silently and returns paired TODOs
   /// (without auto-completing them) so the UI can show a picker sheet.

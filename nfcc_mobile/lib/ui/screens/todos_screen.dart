@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/todo.dart';
 import '../../services/database_service.dart';
+import '../../services/nfc_service.dart';
 import '../../utils/icon_lookup.dart';
 import '../theme/app_theme.dart';
 import '../widgets/tag_picker_sheet.dart';
@@ -75,6 +76,88 @@ class _TodosScreenState extends State<TodosScreen> {
       await context.read<DatabaseService>().deleteTodo(t.id!);
       _load();
     }
+  }
+
+  Future<void> _writeTagForTodo(Todo t) async {
+    if (t.id == null) return;
+    hapticMedium();
+    final nfc = context.read<NfcService>();
+    if (!await nfc.isAvailable()) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('NFC not available')));
+      }
+      return;
+    }
+    if (!mounted) return;
+
+    final color = Color(t.colorValue);
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surfaceHigh,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 16),
+            Container(
+              width: 64, height: 64,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Icon(Icons.nfc_rounded, size: 32, color: color),
+            ),
+            const SizedBox(height: 20),
+            const Text('Hold NFC tag near device',
+                style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600)),
+            const SizedBox(height: 6),
+            Text(
+              'Writing TODO "${t.name}" — tap the tag to mark it complete',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                  color: AppColors.textSecondary, fontSize: 13),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              nfc.stopSession();
+              Navigator.pop(ctx);
+            },
+            child: const Text('Cancel',
+                style: TextStyle(color: AppColors.textSecondary)),
+          ),
+        ],
+      ),
+    );
+
+    await nfc.startWriteSession(
+      data: 'NFCC_D:${t.id}',
+      onResult: (success, msg) {
+        if (mounted) {
+          Navigator.of(context, rootNavigator: true).pop();
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(success
+                ? 'Tag written for "${t.name}"'
+                : 'Failed: $msg'),
+            backgroundColor:
+                success ? AppColors.success : AppColors.error,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12)),
+            margin: const EdgeInsets.all(16),
+          ));
+          if (success) _load();
+        }
+      },
+    );
   }
 
   Future<void> _toggleToday(Todo t) async {
@@ -401,8 +484,31 @@ class _TodosScreenState extends State<TodosScreen> {
                     Icon(Icons.check_circle_rounded,
                         color: color, size: 22)
                   else
-                    const Icon(Icons.chevron_right_rounded,
-                        size: 18, color: AppColors.textTertiary),
+                    Material(
+                      color: AppColors.nfcGlow.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(10),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(10),
+                        onTap: () => _writeTagForTodo(t),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 6),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.nfc_rounded,
+                                  size: 13, color: AppColors.nfcGlow),
+                              SizedBox(width: 4),
+                              Text('Write',
+                                  style: TextStyle(
+                                      color: AppColors.nfcGlow,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700)),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),

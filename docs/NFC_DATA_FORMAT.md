@@ -8,7 +8,7 @@ NFCC tags store a **single NDEF message**. The app uses the tag's UID as the pri
 | ------ | ----------------------- | ----------------------------------------------------- |
 | URI    | `https://`, `tel:`, `mailto:` etc. | Free-form URL.                                        |
 | Text   | —                       | Plain UTF-8 text.                                     |
-| MIME   | `application/com.nfccontrol.nfcc` | App routine handle. Value: `NFCC:<automation_id>`.    |
+| MIME   | `application/com.nfccontrol.nfcc` | App handle. Payload prefixes:<br>• `NFCC:<id>` — routine<br>• `NFCC_T:<id>` — tracker<br>• `NFCC_D:<id>` — TODO |
 | Wi-Fi  | `application/vnd.wfa.wsc` | Wi-Fi Simple Configuration credentials.              |
 | GeoURI | `geo:<lat>,<lng>`       | Coordinates.                                          |
 
