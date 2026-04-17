@@ -113,3 +113,23 @@ nfcc-web/pnpm-lock.yaml
 *.db-journal
 *.sqlite
 *.sqlite3
+
+# ═════════════════════════════════════════════════════════════════════════
+#  F-Droid hard-blocks — NEVER commit these
+#  (any of these files in the repo will cause F-Droid's buildserver
+#   to reject the build as NonFree or Tracking.)
+# ═════════════════════════════════════════════════════════════════════════
+google-services.json
+GoogleService-Info.plist
+firebase_options.dart
+agconnect-services.json
+
+# No compiled binaries under source tree
+nfcc_mobile/**/*.jar
+nfcc_mobile/**/*.aar
+nfcc_mobile/**/*.so
+nfcc_mobile/**/*.class
+nfcc_mobile/**/*.dex
+# (gradle-wrapper.jar lives under android/gradle/wrapper/ — that one is
+#  intentionally excluded from commits via the standard Flutter .gitignore
+#  inside nfcc_mobile/android/.)

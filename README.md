@@ -7,7 +7,10 @@
   <a href="https://github.com/PATILYASHH/nfcc/actions/workflows/pc-windows.yml"><img alt="Windows EXE" src="https://github.com/PATILYASHH/nfcc/actions/workflows/pc-windows.yml/badge.svg"></a>
   <a href="https://github.com/PATILYASHH/nfcc/actions/workflows/ios.yml"><img alt="iOS (unsigned)" src="https://github.com/PATILYASHH/nfcc/actions/workflows/ios.yml/badge.svg"></a>
   <a href="https://github.com/PATILYASHH/nfcc/actions/workflows/web.yml"><img alt="Web Preview" src="https://github.com/PATILYASHH/nfcc/actions/workflows/web.yml/badge.svg"></a>
+  <a href="https://github.com/PATILYASHH/nfcc/actions/workflows/fdroid-check.yml"><img alt="F-Droid check" src="https://github.com/PATILYASHH/nfcc/actions/workflows/fdroid-check.yml/badge.svg"></a>
   <img alt="License" src="https://img.shields.io/badge/license-MIT-blue.svg">
+  <img alt="No tracking" src="https://img.shields.io/badge/tracking-none-success">
+  <img alt="No ads" src="https://img.shields.io/badge/ads-none-success">
 </p>
 
 NFCC turns a cheap NFC sticker into a universal remote. One tap can launch apps on your PC, toggle phone state, log a glass of water, clock in at work, or tick off a daily TODO — and the same tag can do all of that at once.
@@ -87,6 +90,8 @@ npm install && npm run dev
 - [Architecture overview](docs/ARCHITECTURE.md) — how phone, PC, and tag talk to each other
 - [User guide](docs/USER_GUIDE.md) — routines, tracking, TODOs, tag pairing
 - [NFC data format](docs/NFC_DATA_FORMAT.md) — what's written to a tag
+- [Android permissions rationale](docs/PERMISSIONS.md) — every permission justified + anti-features declaration
+- [Dependency audit (FOSS SBOM)](docs/DEPENDENCIES.md) — every package + license
 - [Publishing to F-Droid](docs/FDROID.md) — submission steps for `fdroiddata`
 - [Contributing](CONTRIBUTING.md)
 

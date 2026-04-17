@@ -1,0 +1,118 @@
+name: F-Droid compliance
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'nfcc_mobile/**'
+      - '.fdroid/**'
+      - '.github/workflows/fdroid-check.yml'
+  pull_request:
+    paths:
+      - 'nfcc_mobile/**'
+      - '.fdroid/**'
+  workflow_dispatch:
+
+jobs:
+  proprietary-deps:
+    name: Scan for proprietary deps
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fail on non-FOSS pub dependencies
+        shell: bash
+        run: |
+          set -e
+          BANNED='firebase_|google_mobile_ads|google_sign_in|cloud_firestore|firebase_analytics|firebase_crashlytics|firebase_messaging|sentry|flutter_appsflyer|amplitude_flutter|mixpanel_flutter|branch_sdk|adjust_sdk|facebook_audience_network|flutter_facebook_auth|onesignal_flutter|huawei_|oppo_|xiaomi_'
+          if grep -rEn "($BANNED):" nfcc_mobile/pubspec.yaml; then
+            echo "::error::Proprietary / tracking dependency detected in pubspec.yaml — F-Droid will reject this build."
+            exit 1
+          fi
+          echo "✓ No banned dependencies in pubspec.yaml"
+
+      - name: Fail on Google Services / Firebase config files
+        shell: bash
+        run: |
+          set -e
+          if find nfcc_mobile -type f \( -name 'google-services.json' -o -name 'GoogleService-Info.plist' -o -name 'firebase_options.dart' -o -name 'agconnect-services.json' \) | grep .; then
+            echo "::error::Proprietary service config file committed — remove before F-Droid submission."
+            exit 1
+          fi
+          echo "✓ No Google/Firebase/Huawei service files"
+
+      - name: Fail on binary blobs in source tree
+        shell: bash
+        run: |
+          set -e
+          BLOBS=$(git ls-files nfcc_mobile | grep -Ei '\.(jar|aar|so|dex|apk|aab|class|dll|dylib|exe)$' || true)
+          if [ -n "$BLOBS" ]; then
+            echo "::error::Binary blob committed: $BLOBS"
+            exit 1
+          fi
+          echo "✓ No binary blobs in source tree"
+
+  fdroid-lint:
+    name: fdroid lint build recipe
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install fdroidserver
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fdroidserver
+        continue-on-error: true
+
+      - name: Lint .fdroid/ metadata (YAML sanity)
+        shell: bash
+        run: |
+          python3 - <<'EOF'
+          import yaml, sys, pathlib
+          p = pathlib.Path('.fdroid/com.nfccontrol.nfcc_mobile.yml')
+          data = yaml.safe_load(p.read_text())
+          required = ['Categories', 'License', 'SourceCode', 'IssueTracker',
+                      'Repo', 'RepoType', 'Builds',
+                      'AutoUpdateMode', 'UpdateCheckMode',
+                      'CurrentVersion', 'CurrentVersionCode']
+          missing = [k for k in required if k not in data]
+          if missing:
+              sys.exit(f"✗ .fdroid yaml missing required keys: {missing}")
+          if data['License'] != 'MIT':
+              sys.exit(f"✗ License should be MIT, got {data['License']}")
+          if not data['Builds']:
+              sys.exit("✗ No Builds entries")
+          b = data['Builds'][-1]
+          if str(b['versionCode']) != str(data['CurrentVersionCode']):
+              sys.exit(f"✗ Latest Build versionCode {b['versionCode']} != CurrentVersionCode {data['CurrentVersionCode']}")
+          if b['versionName'] != data['CurrentVersion']:
+              sys.exit(f"✗ Latest Build versionName {b['versionName']} != CurrentVersion {data['CurrentVersion']}")
+          print("✓ .fdroid yaml looks good")
+          EOF
+
+  permissions-doc:
+    name: Every manifest permission is documented
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cross-check AndroidManifest permissions vs docs
+        shell: bash
+        run: |
+          set -e
+          MANIFEST=nfcc_mobile/android/app/src/main/AndroidManifest.xml
+          DOC=docs/PERMISSIONS.md
+          PERMS=$(grep -oE 'android:name="android.permission\.[A-Z_]+"' "$MANIFEST" | sed -E 's/.*\.([A-Z_]+)"$/\1/' | sort -u)
+          missing=0
+          for p in $PERMS; do
+            if ! grep -q "\b$p\b" "$DOC"; then
+              echo "::error::Permission $p is in the manifest but not documented in docs/PERMISSIONS.md"
+              missing=1
+            fi
+          done
+          if [ $missing -eq 1 ]; then exit 1; fi
+          echo "✓ All manifest permissions are documented"

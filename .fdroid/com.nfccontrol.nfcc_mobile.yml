@@ -4,6 +4,8 @@
 # what goes into the fdroiddata repository when requesting inclusion in the
 # official F-Droid repo. See docs/FDROID.md for the submission flow.
 #
+# Reference: https://f-droid.org/en/docs/Build_Metadata_Reference/
+#
 # After submission, the canonical copy lives at:
 #   https://gitlab.com/fdroid/fdroiddata/-/blob/master/metadata/com.nfccontrol.nfcc_mobile.yml
 
@@ -17,14 +19,19 @@ WebSite: https://patilyashh.github.io/nfcc/
 SourceCode: https://github.com/PATILYASHH/nfcc
 IssueTracker: https://github.com/PATILYASHH/nfcc/issues
 Changelog: https://github.com/PATILYASHH/nfcc/releases
+Donate: https://github.com/sponsors/PATILYASHH
 
 AutoName: NFCC
-Description: |-
-  NFCC turns an NFC tag into a universal remote. One tap can fire a routine,
-  log habits (water, coffee, IN/OUT), complete daily TODOs, and — with the
-  optional PC companion — launch apps, control media or lock your workstation.
 
-  All data stays on the device. No cloud, no account, no tracking.
+Description: |-
+  NFCC turns an NFC tag into a universal remote. One tap can fire a routine
+  (Wi-Fi, Bluetooth, time, weekday conditions), log habits (water, coffee,
+  IN/OUT), complete daily TODOs with streak tracking, and — with the optional
+  PC companion over local Wi-Fi — launch apps, control media, or lock your
+  workstation.
+
+  All data stays on the device in a local SQLite database. No cloud account,
+  no analytics, no tracking. MIT licensed.
 
 RepoType: git
 Repo: https://github.com/PATILYASHH/nfcc
@@ -43,7 +50,11 @@ Builds:
     srclibs:
       - flutter@3.38.9
     rm:
-      - nfcc_mobile/.metadata
+      - nfcc_mobile/ios
+      - nfcc_mobile/macos
+      - nfcc_mobile/windows
+      - nfcc_mobile/linux
+      - nfcc_mobile/web
     scandelete:
       - nfcc_mobile/pubspec.lock
     prebuild:
@@ -54,9 +65,11 @@ Builds:
       - export PUB_CACHE="$$PWD$$/.pub-cache"
       - $$flutter$$/bin/flutter build apk --release --no-tree-shake-icons
     output: build/app/outputs/flutter-apk/app-release.apk
-    ndk: r27c
+    novcheck: true
 
-AutoUpdateMode: Version
-UpdateCheckMode: Tags
+# Auto-pick up new releases tagged `vX.Y.Z` on the GitHub repo.
+AutoUpdateMode: Version v%v
+UpdateCheckMode: Tags ^v[0-9]+\.[0-9]+\.[0-9]+$
+UpdateCheckData: nfcc_mobile/pubspec.yaml|^version:\s*(\d+\.\d+\.\d+)\+.*$|^|^version:\s*\d+\.\d+\.\d+\+(\d+)$
 CurrentVersion: 1.0.0
 CurrentVersionCode: 1
