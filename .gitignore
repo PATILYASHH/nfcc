@@ -1,0 +1,115 @@
+# ── OS / Editor ─────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+!.vscode/settings.json
+*.iml
+.history/
+
+# ── Secrets / env ───────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+secrets/
+keystore.properties
+key.jks
+*.keystore
+
+# ── Preview / local scratch ─────────────────────────────────────────────
+preview.html
+scratch/
+tmp/
+
+# ═════════════════════════════════════════════════════════════════════════
+#  Flutter (nfcc_mobile)
+# ═════════════════════════════════════════════════════════════════════════
+nfcc_mobile/.dart_tool/
+nfcc_mobile/.flutter-plugins
+nfcc_mobile/.flutter-plugins-dependencies
+nfcc_mobile/.packages
+nfcc_mobile/.pub-cache/
+nfcc_mobile/.pub/
+nfcc_mobile/build/
+nfcc_mobile/.gradle/
+nfcc_mobile/android/.gradle/
+nfcc_mobile/android/local.properties
+nfcc_mobile/android/app/release/
+nfcc_mobile/android/app/debug/
+nfcc_mobile/android/app/profile/
+nfcc_mobile/android/app/build/
+nfcc_mobile/android/captures/
+nfcc_mobile/android/gradlew
+nfcc_mobile/android/gradlew.bat
+nfcc_mobile/android/key.properties
+nfcc_mobile/ios/Pods/
+nfcc_mobile/ios/.symlinks/
+nfcc_mobile/ios/Flutter/flutter_export_environment.sh
+nfcc_mobile/ios/Flutter/Generated.xcconfig
+nfcc_mobile/ios/Flutter/App.framework/
+nfcc_mobile/ios/Flutter/Flutter.framework/
+nfcc_mobile/ios/Flutter/Flutter.podspec
+nfcc_mobile/ios/Runner.xcworkspace/xcuserdata/
+nfcc_mobile/ios/Runner.xcodeproj/project.xcworkspace/xcuserdata/
+nfcc_mobile/ios/Runner.xcodeproj/xcuserdata/
+nfcc_mobile/macos/Pods/
+nfcc_mobile/macos/Flutter/ephemeral/
+nfcc_mobile/linux/flutter/ephemeral/
+nfcc_mobile/windows/flutter/ephemeral/
+nfcc_mobile/windows/x64/
+nfcc_mobile/web/sqflite_sw.js
+nfcc_mobile/web/sqlite3.wasm
+
+# Generated
+nfcc_mobile/**/GeneratedPluginRegistrant.*
+nfcc_mobile/lib/main_web.dart.save
+nfcc_mobile/pubspec.lock
+
+# APK / IPA / AAB artifacts
+*.apk
+*.aab
+*.ipa
+*.apk.sha1
+
+# ═════════════════════════════════════════════════════════════════════════
+#  Python (nfcc_pc)
+# ═════════════════════════════════════════════════════════════════════════
+nfcc_pc/__pycache__/
+nfcc_pc/**/__pycache__/
+nfcc_pc/*.pyc
+nfcc_pc/*.pyo
+nfcc_pc/.venv/
+nfcc_pc/venv/
+nfcc_pc/env/
+nfcc_pc/build/
+nfcc_pc/dist/
+nfcc_pc/*.spec
+nfcc_pc/nfcc_config.json
+nfcc_pc/logs/
+nfcc_pc/*.log
+
+# ═════════════════════════════════════════════════════════════════════════
+#  Next.js (nfcc-web)
+# ═════════════════════════════════════════════════════════════════════════
+nfcc-web/node_modules/
+nfcc-web/.next/
+nfcc-web/out/
+nfcc-web/build/
+nfcc-web/.vercel/
+nfcc-web/package-lock.json
+nfcc-web/yarn.lock
+nfcc-web/pnpm-lock.yaml
+
+# ═════════════════════════════════════════════════════════════════════════
+#  Local databases / generated artifacts
+# ═════════════════════════════════════════════════════════════════════════
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
