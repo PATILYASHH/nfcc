@@ -39,6 +39,22 @@ class PcConnectionService extends ChangeNotifier {
     await _connect();
   }
 
+  /// Called on app launch. If a PairedPc row exists in the DB, pick the
+  /// most recently paired one and connect to it in the background.
+  /// Never blocks the UI; failures silently fall into the reconnect loop
+  /// so the connection eventually comes up when the LAN is reachable.
+  Future<void> restoreStoredPairing() async {
+    try {
+      final pcs = await _db.getPairedPcs();
+      if (pcs.isEmpty) return;
+      debugPrint('NFCC: auto-connecting to stored PC ${pcs.first.name} '
+          '(${pcs.first.ip}:${pcs.first.port})');
+      await connectToPc(pcs.first);
+    } catch (e) {
+      debugPrint('NFCC: restoreStoredPairing error: $e');
+    }
+  }
+
   /// Connect using QR code data
   Future<void> connectFromQr(Map<String, dynamic> qrData) async {
     final pc = PairedPc(

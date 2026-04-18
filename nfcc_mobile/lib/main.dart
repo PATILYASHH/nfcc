@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -32,6 +33,12 @@ void main() async {
       SilentExecutor().onTagDetected(uid, ndefText);
     },
   );
+
+  // Auto-reconnect to the last paired PC so users don't re-pair every
+  // app launch. Runs in the background; failures drop into the normal
+  // reconnect loop (UDP rediscovery on every 3rd attempt) so it comes
+  // up as soon as the PC is on the LAN.
+  unawaited(PcConnectionService().restoreStoredPairing());
 
   runApp(const NfccApp());
 }

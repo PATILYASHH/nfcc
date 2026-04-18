@@ -46,18 +46,41 @@ class _DiscoveryProtocol(asyncio.DatagramProtocol):
 
     def datagram_received(self, data: bytes, addr: tuple):
         if data.startswith(MAGIC):
+            # Reply with the IP of the interface the packet arrived on,
+            # not whatever random outbound-route IP _get_local_ip() picks.
+            # Fixes the "phone on Wi-Fi, PC has Ethernet + Wi-Fi, PC
+            # advertises the wrong subnet" bug where discovery worked
+            # but the WebSocket URL was unreachable.
+            reply_ip = _local_ip_for(addr[0])
             response = json.dumps({
                 "id": self.config["id"],
                 "name": socket.gethostname(),
-                "ip": _get_local_ip(),
+                "ip": reply_ip,
                 "port": self.config["port"],
                 "token": self.config["pairing_token"],
             }).encode()
             self.transport.sendto(response, addr)
-            logger.info(f"Discovery: responded to {addr[0]}")
+            logger.info(f"Discovery: responded to {addr[0]} with {reply_ip}:{self.config['port']}")
 
     def connection_made(self, transport):
         self.transport = transport
+
+
+def _local_ip_for(remote_ip: str) -> str:
+    """The local IPv4 address Python would use to reach `remote_ip`.
+
+    Opens a DGRAM socket (never actually sends anything) and asks the OS
+    which local address would win the routing decision. Returns the
+    correct interface even on a multi-homed host (Ethernet + Wi-Fi).
+    """
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect((remote_ip, 1))
+        return s.getsockname()[0]
+    except Exception:
+        return _get_local_ip()
+    finally:
+        s.close()
 
 
 def _get_local_ip() -> str:
