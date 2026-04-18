@@ -283,21 +283,25 @@ def build_html(config: dict) -> str:
 
 class DashboardHandler(BaseHTTPRequestHandler):
     config = {}
+    on_reconnect = None   # set by start_dashboard
+    on_forward = None     # set by start_dashboard
+
+    def _write_json(self, code: int, data: dict) -> None:
+        self.send_response(code)
+        self.send_header('Content-Type', 'application/json')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.end_headers()
+        self.wfile.write(json.dumps(data).encode())
 
     def do_GET(self):
         if self.path == '/api/status':
             state = get_state()
-            data = {
+            self._write_json(200, {
                 "status": state.status,
                 "devices": len(state.connected_devices),
                 "actions": state.action_log,
                 "action_count": len(state.action_log),
-            }
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            self.wfile.write(json.dumps(data).encode())
+            })
         else:
             html = build_html(self.config)
             self.send_response(200)
@@ -305,12 +309,44 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(html.encode())
 
+    def do_POST(self):
+        if self.path == '/api/reconnect':
+            cb = type(self).on_reconnect
+            if cb is None:
+                self._write_json(503, {"ok": False, "error": "reconnect not wired"})
+                return
+            try:
+                cb()
+                self._write_json(200, {"ok": True})
+            except Exception as e:
+                self._write_json(500, {"ok": False, "error": str(e)})
+        elif self.path == '/api/forward':
+            cb = type(self).on_forward
+            if cb is None:
+                self._write_json(503, {"ok": False, "error": "forward not wired"})
+                return
+            try:
+                result = cb()
+                self._write_json(200, {"ok": True, **(result or {})})
+            except Exception as e:
+                self._write_json(500, {"ok": False, "error": str(e)})
+        else:
+            self._write_json(404, {"ok": False, "error": "not found"})
+
     def log_message(self, format, *args):
         pass  # Suppress HTTP logs
 
 
-def start_dashboard(config: dict, port: int = 8877):
+def start_dashboard(
+    config: dict,
+    port: int = 8877,
+    *,
+    on_reconnect=None,
+    on_forward=None,
+):
     DashboardHandler.config = config
+    DashboardHandler.on_reconnect = on_reconnect
+    DashboardHandler.on_forward = on_forward
     server = HTTPServer(('0.0.0.0', port), DashboardHandler)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()

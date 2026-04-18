@@ -25,19 +25,58 @@ python main.py serve      # foreground, Ctrl+C to stop
 
 The tray icon is still what keeps it alive in this mode too; the terminal is only there for logs.
 
-### CLI
+### The `NFCC-PC` terminal command
+
+Add `nfcc_pc/` to your `PATH` and you can run from any directory in any terminal:
 
 ```
-nfcc                                # same as `nfcc serve`
-nfcc serve [--open-browser]         # start the tray service
-nfcc status                         # print config + IP + port
-nfcc pair                           # print pairing JSON for copy/paste
-nfcc dashboard                      # open the dashboard in the browser
-nfcc action lockPc                  # execute a PC action locally, no network
-nfcc action launchApp --params '{"name":"notepad"}'
+NFCC-PC                                # same as `NFCC-PC serve`
+NFCC-PC serve [--open-browser]         # start the tray service
+NFCC-PC status                         # print config + IP + port
+NFCC-PC pair                           # print pairing JSON for copy/paste
+NFCC-PC dashboard                      # open the dashboard in the browser
+NFCC-PC reconnect                      # tell the running service to restart its network services
+NFCC-PC forward [--port N]             # open the port on your router via UPnP
+NFCC-PC unforward [--port N]           # remove the UPnP port mapping
+NFCC-PC action lockPc                  # execute a PC action locally, no network
+NFCC-PC action launchApp --params '{"name":"notepad"}'
 ```
 
-`nfcc action` is handy for scripts, scheduled tasks, and debugging without involving the phone at all. Add `nfcc_pc/` (or the folder containing `nfcc.bat`) to your `PATH` to call it from anywhere.
+- **`NFCC-PC reconnect`** hits `POST http://localhost:8877/api/reconnect` on the already-running tray service. It stops and restarts the WebSocket server + UDP discovery in-place, which rebinds ports (picking up the port-fallback range) and re-announces to phones. Paired phones auto-re-authenticate within a few seconds.
+- **`NFCC-PC forward`** uses UPnP (IGD v1/v2) to ask the router to open the current port. Works on routers with UPnP enabled — most consumer routers, many ISPs have disabled it. See the next section.
+- **`NFCC-PC action`** runs through the same `execute_action()` path the WebSocket uses — perfect for Task Scheduler jobs and shell scripts without involving the phone at all.
+
+Inside the tray menu, the same three actions are now exposed as **Reconnect (restart services)** and **Forward Port via UPnP** alongside **Open Dashboard…** and **Copy Pairing JSON**.
+
+## UPnP port forwarding
+
+By default the companion is LAN-only. If you want phones on *other* networks (cellular, other Wi-Fi) to reach your PC, you need an inbound port open on your router. `NFCC-PC forward` does this automatically via UPnP:
+
+```
+> NFCC-PC forward
+{
+  "external_ip":   "203.0.113.42",
+  "external_port": 9876,
+  "internal_ip":   "192.168.0.119",
+  "internal_port": 9876,
+  "description":   "NFCC PC Companion"
+}
+```
+
+After that, pair the phone once at `ws://<external_ip>:9876` and it will reach your PC from anywhere.
+
+**Caveats.**
+- UPnP must be enabled in your router admin. Many routers ship with it off for security.
+- Exposing a service to the public internet is a security trade-off. The PC companion requires a pairing token, so random scanners can't issue commands — but the **attack surface is larger** than LAN-only mode.
+- Double-NAT / carrier-grade NAT (common on cellular and some fibre ISPs) means UPnP on the local router does nothing. In that case use **Tailscale** or **WireGuard** (see below) — both are free and libre and much safer than opening router ports.
+
+To take the mapping back down:
+```
+> NFCC-PC unforward
+removed=True
+```
+
+Mappings persist until you unforward, reboot the router, or the router's lease expires (~24 h on most).
 
 
 

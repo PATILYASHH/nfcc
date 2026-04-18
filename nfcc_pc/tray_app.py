@@ -49,11 +49,15 @@ class TrayApp:
         config: Optional[dict] = None,
         on_show_dashboard: Optional[Callable[[], None]] = None,
         on_copy_pairing: Optional[Callable[[], str]] = None,
+        on_reconnect: Optional[Callable[[], None]] = None,
+        on_forward: Optional[Callable[[], dict]] = None,
         on_quit: Optional[Callable[[], None]] = None,
     ):
         self.config = config or {}
         self.on_show_dashboard = on_show_dashboard
         self.on_copy_pairing = on_copy_pairing
+        self.on_reconnect = on_reconnect
+        self.on_forward = on_forward
         self.on_quit = on_quit
         self._icon: Optional[pystray.Icon] = None
         self._status = "Starting…"
@@ -73,6 +77,8 @@ class TrayApp:
             pystray.Menu.SEPARATOR,
             pystray.MenuItem("Open Dashboard…", self._on_show_dashboard),
             pystray.MenuItem("Copy Pairing JSON", self._on_copy_pairing),
+            pystray.MenuItem("Reconnect (restart services)", self._on_reconnect),
+            pystray.MenuItem("Forward Port via UPnP", self._on_forward),
             pystray.Menu.SEPARATOR,
             pystray.MenuItem("Quit NFCC", self._on_quit),
         )
@@ -120,6 +126,23 @@ class TrayApp:
             with open(path, "w") as f:
                 f.write(payload)
             logger.info(f"Pairing JSON written to {path} (install `pyperclip` for clipboard support)")
+
+    def _on_reconnect(self, icon, item) -> None:
+        if self.on_reconnect:
+            threading.Thread(target=self.on_reconnect, daemon=True).start()
+
+    def _on_forward(self, icon, item) -> None:
+        if not self.on_forward:
+            return
+
+        def _run():
+            try:
+                result = self.on_forward()
+                logger.info(f"Forward OK: {result}")
+            except Exception as e:
+                logger.warning(f"Forward failed: {e}")
+
+        threading.Thread(target=_run, daemon=True).start()
 
     def _on_quit(self, icon, item) -> None:
         if self.on_quit:
