@@ -35,7 +35,7 @@ NFCC turns a cheap NFC sticker into a universal remote. One tap can launch apps 
 | 🍎 iOS (preview) | `NFCC-Runner.app.zip`     | Actions artifacts · unsigned, for developer sideload                 |
 | 🍏 macOS         | *planned*                 | Needs cross-platform audio refactor                                   |
 | 🐧 Linux         | *planned*                 | Needs cross-platform audio refactor                                   |
-| 🌐 Web preview   | live demo                 | https://patilyashh.github.io/nfcc/                                   |
+| 🌐 Web preview   | live demo                 | https://nfcc-patilyashh.netlify.app                                   |
 
 Every push to `main` uploads build artifacts to the corresponding Actions run. Creating a GitHub Release attaches the Android APK and Windows EXE automatically.
 
