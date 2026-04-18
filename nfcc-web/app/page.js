@@ -50,7 +50,7 @@ export default function Home() {
           </a>
           <div className="nav-links">
             <a href="#features">Features</a>
-            <a href="#how">How it works</a>
+            <a href="#screenshots">Screens</a>
             <a href="#actions">Actions</a>
             <a href="#architecture">Architecture</a>
             <a href="#roadmap">Roadmap</a>
@@ -275,6 +275,37 @@ export default function Home() {
                 <PcMock />
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ========== SCREENSHOTS ========== */}
+      <section className="block tinted-block" id="screenshots">
+        <div className="container">
+          <div className="section-head center">
+            <span className="eyebrow reveal">Screens</span>
+            <h2 className="h2 reveal d1">Shot on device, not mocked up.</h2>
+            <p className="sub reveal d2">
+              Every pixel below is the current Android build. Dark Samsung-inspired
+              theme, one-handed friendly, haptic feedback on every tap.
+            </p>
+          </div>
+
+          <div className="shots">
+            {SHOTS.map((s, i) => (
+              <figure
+                key={s.src}
+                className={`shot reveal d${Math.min(i + 1, 6)}`}
+              >
+                <div className="shot-frame">
+                  <img src={s.src} alt={s.caption} loading="lazy" />
+                </div>
+                <figcaption>
+                  <span className="shot-num">0{i + 1}</span>
+                  <span className="shot-cap">{s.caption}</span>
+                </figcaption>
+              </figure>
+            ))}
           </div>
         </div>
       </section>
@@ -653,6 +684,25 @@ const PC_ACTIONS = [
   { name: 'Toggle Fullscreen', ic: '⛶', color: '#A0A4AE' },
   { name: 'Start Stream', ic: '📡', color: '#EF4444' },
   { name: 'Custom Script', ic: '🧩', color: '#00B0FF' },
+];
+
+const SHOTS = [
+  {
+    src: '/screenshots/01-smart-nfc-hub.png',
+    caption: 'Smart NFC hub — Routines, Tracking, TODOs in one place',
+  },
+  {
+    src: '/screenshots/02-nfc-writer.png',
+    caption: 'NFC Writer — URL, Wi-Fi, UPI, location, app launcher',
+  },
+  {
+    src: '/screenshots/03-automation-editor.png',
+    caption: 'IF / ELSE automation editor with live conditions',
+  },
+  {
+    src: '/screenshots/04-nfc-scan.png',
+    caption: 'Tap feedback — haptic confirmation on every scan',
+  },
 ];
 
 const DOWNLOADS = [

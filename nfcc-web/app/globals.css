@@ -44,6 +44,21 @@ body {
   overflow-x: hidden;
 }
 
+/* Subtle aurora behind the whole page so it never reads as pitch-black.
+   Fixed so it persists through scroll instead of tiling. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 900px 600px at 15% -10%, rgba(0, 176, 255, 0.06), transparent 60%),
+    radial-gradient(ellipse 800px 500px at 100% 40%, rgba(139, 92, 246, 0.05), transparent 60%),
+    radial-gradient(ellipse 700px 400px at 0% 90%, rgba(236, 72, 153, 0.04), transparent 60%);
+}
+body > * { position: relative; z-index: 1; }
+
 a {
   color: inherit;
   text-decoration: none;
@@ -1081,6 +1096,100 @@ footer {
   gap: 12px;
   margin-top: 28px;
   flex-wrap: wrap;
+}
+
+/* ═════════════════════════════════════════════════════════
+   Tinted section — breaks up the pitch-black monotony
+   ═════════════════════════════════════════════════════════ */
+.tinted-block {
+  position: relative;
+  background:
+    radial-gradient(ellipse at 30% 0%, rgba(0, 176, 255, 0.06), transparent 55%),
+    radial-gradient(ellipse at 75% 100%, rgba(139, 92, 246, 0.07), transparent 60%),
+    linear-gradient(180deg, #070710, #030307 80%, var(--bg) 100%);
+  border-top: 1px solid rgba(0, 176, 255, 0.08);
+  border-bottom: 1px solid rgba(139, 92, 246, 0.08);
+}
+
+/* ═════════════════════════════════════════════════════════
+   Screenshot gallery
+   ═════════════════════════════════════════════════════════ */
+.shots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+  margin-top: 40px;
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.shot { margin: 0; display: flex; flex-direction: column; align-items: center; }
+.shot-frame {
+  position: relative;
+  width: 100%;
+  max-width: 260px;
+  aspect-ratio: 9 / 19.5;
+  border-radius: 28px;
+  background: linear-gradient(180deg, #0a0a0f 0%, #000 100%);
+  border: 1px solid var(--border-lit);
+  padding: 8px;
+  box-shadow:
+    0 32px 64px -12px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+    0 0 60px -10px rgba(0, 176, 255, 0.12);
+  transition: transform .35s var(--easing), box-shadow .35s var(--easing);
+}
+.shot-frame::before {
+  content: "";
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 72px;
+  height: 18px;
+  border-radius: 12px;
+  background: #000;
+  border: 1px solid #1a1a20;
+  z-index: 2;
+}
+.shot-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 22px;
+  object-fit: cover;
+}
+.shot:hover .shot-frame {
+  transform: translateY(-6px);
+  box-shadow:
+    0 40px 72px -12px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 0 80px -10px rgba(0, 176, 255, 0.22);
+}
+.shot figcaption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 18px;
+  text-align: center;
+  max-width: 280px;
+}
+.shot-num {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+  color: var(--nfc);
+  background: rgba(0, 176, 255, 0.1);
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 176, 255, 0.25);
+}
+.shot-cap {
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.4;
+  font-weight: 500;
 }
 
 /* ═════════════════════════════════════════════════════════

@@ -5,11 +5,13 @@ import 'package:flutter/services.dart';
 class AppColors {
   AppColors._();
 
-  // Backgrounds
-  static const Color background      = Color(0xFF000000);
-  static const Color surface         = Color(0xFF0A0A0A);
-  static const Color surfaceElevated = Color(0xFF111111);
-  static const Color surfaceHigh     = Color(0xFF1A1A1A);
+  // Backgrounds — barely-blue-tinted near-black so the app reads as
+  // "deep dark UI" rather than "pitch-black void". The tint shifts at
+  // higher levels give depth without compromising the minimal feel.
+  static const Color background      = Color(0xFF05060A);
+  static const Color surface         = Color(0xFF0B0C12);
+  static const Color surfaceElevated = Color(0xFF12141B);
+  static const Color surfaceHigh     = Color(0xFF1C1F29);
   static const Color surfaceGlass    = Color(0x15FFFFFF);
 
   // Borders

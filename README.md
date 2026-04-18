@@ -11,7 +11,11 @@
   <img alt="License" src="https://img.shields.io/badge/license-MIT-blue.svg">
   <img alt="No tracking" src="https://img.shields.io/badge/tracking-none-success">
   <img alt="No ads" src="https://img.shields.io/badge/ads-none-success">
+  <a href="https://github.com/sponsors/PATILYASHH"><img alt="Sponsor" src="https://img.shields.io/badge/sponsor-%E2%9D%A4-EC4899?logo=githubsponsors&logoColor=white"></a>
 </p>
+
+> NFCC is **100% free and open source (MIT)** — no ads, no tracking, no paid tier, forever.
+> If it saves you time, [sponsor the project ❤](https://github.com/sponsors/PATILYASHH) to keep releases, builds, and F-Droid submissions coming.
 
 NFCC turns a cheap NFC sticker into a universal remote. One tap can launch apps on your PC, toggle phone state, log a glass of water, clock in at work, or tick off a daily TODO — and the same tag can do all of that at once.
 
