@@ -55,8 +55,6 @@ Builds:
       - nfcc_mobile/windows
       - nfcc_mobile/linux
       - nfcc_mobile/web
-    scandelete:
-      - nfcc_mobile/pubspec.lock
     prebuild:
       - export PUB_CACHE="$$PWD$$/.pub-cache"
       - $$flutter$$/bin/flutter config --no-analytics
@@ -85,8 +83,6 @@ Builds:
       - nfcc_mobile/windows
       - nfcc_mobile/linux
       - nfcc_mobile/web
-    scandelete:
-      - nfcc_mobile/pubspec.lock
     prebuild:
       - export PUB_CACHE="$$PWD$$/.pub-cache"
       - $$flutter$$/bin/flutter config --no-analytics

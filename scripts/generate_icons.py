@@ -136,8 +136,8 @@ def main() -> None:
     master = render_icon(1024)
     save(master, ROOT / "docs" / "brand" / "nfcc-icon-1024.png")
 
-    # ─ F-Droid / Google Play listing (Fastlane metadata) ───────────────
-    save(render_icon(512), ROOT / "nfcc_mobile" / "fastlane" / "metadata" /
+    # ─ F-Droid / Google Play listing (Fastlane metadata at repo root) ──
+    save(render_icon(512), ROOT / "fastlane" / "metadata" /
          "android" / "en-US" / "images" / "icon.png")
 
     # ─ Android launcher (mipmap) ───────────────────────────────────────

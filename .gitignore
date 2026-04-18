@@ -69,7 +69,7 @@ nfcc_mobile/web/sqlite3.wasm
 # Generated
 nfcc_mobile/**/GeneratedPluginRegistrant.*
 nfcc_mobile/lib/main_web.dart.save
-nfcc_mobile/pubspec.lock
+# pubspec.lock IS committed for F-Droid reproducible builds.
 
 # APK / IPA / AAB artifacts
 *.apk
@@ -102,7 +102,7 @@ nfcc-web/.next/
 nfcc-web/out/
 nfcc-web/build/
 nfcc-web/.vercel/
-nfcc-web/package-lock.json
+# package-lock.json IS committed for reproducible Netlify builds.
 nfcc-web/yarn.lock
 nfcc-web/pnpm-lock.yaml
 
