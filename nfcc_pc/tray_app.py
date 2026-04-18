@@ -18,6 +18,14 @@ from PIL import Image, ImageDraw
 logger = logging.getLogger("nfcc")
 
 
+def _is_autostart_enabled() -> bool:
+    try:
+        import autostart
+        return autostart.is_autostart_enabled()
+    except Exception:
+        return False
+
+
 def _local_ip() -> str:
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
@@ -80,6 +88,12 @@ class TrayApp:
             pystray.MenuItem("Reconnect (restart services)", self._on_reconnect),
             pystray.MenuItem("Forward Port via UPnP", self._on_forward),
             pystray.Menu.SEPARATOR,
+            pystray.MenuItem(
+                "Start with Windows",
+                self._on_toggle_autostart,
+                checked=lambda _: _is_autostart_enabled(),
+            ),
+            pystray.Menu.SEPARATOR,
             pystray.MenuItem("Quit NFCC", self._on_quit),
         )
         self._icon = pystray.Icon(
@@ -130,6 +144,18 @@ class TrayApp:
     def _on_reconnect(self, icon, item) -> None:
         if self.on_reconnect:
             threading.Thread(target=self.on_reconnect, daemon=True).start()
+
+    def _on_toggle_autostart(self, icon, item) -> None:
+        try:
+            import autostart
+            if autostart.is_autostart_enabled():
+                autostart.disable_autostart()
+            else:
+                autostart.enable_autostart()
+            if self._icon:
+                self._icon.update_menu()
+        except ImportError:
+            logger.warning("autostart module unavailable (non-Windows)")
 
     def _on_forward(self, icon, item) -> None:
         if not self.on_forward:

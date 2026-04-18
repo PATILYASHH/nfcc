@@ -44,6 +44,7 @@ NFCC-PC action launchApp --params '{"name":"notepad"}'
 
 - **`NFCC-PC reconnect`** hits `POST http://localhost:8877/api/reconnect` on the already-running tray service. It stops and restarts the WebSocket server + UDP discovery in-place, which rebinds ports (picking up the port-fallback range) and re-announces to phones. Paired phones auto-re-authenticate within a few seconds.
 - **`NFCC-PC forward`** uses UPnP (IGD v1/v2) to ask the router to open the current port. Works on routers with UPnP enabled — most consumer routers, many ISPs have disabled it. See the next section.
+- **`NFCC-PC autostart enable|disable|status`** adds/removes a `HKCU\Software\Microsoft\Windows\CurrentVersion\Run\NFCC` entry so the companion launches on every login. Same toggle is available from the tray menu as **Start with Windows**.
 - **`NFCC-PC action`** runs through the same `execute_action()` path the WebSocket uses — perfect for Task Scheduler jobs and shell scripts without involving the phone at all.
 
 Inside the tray menu, the same three actions are now exposed as **Reconnect (restart services)** and **Forward Port via UPnP** alongside **Open Dashboard…** and **Copy Pairing JSON**.

@@ -3,6 +3,7 @@ import 'package:installed_apps/installed_apps.dart';
 import 'package:installed_apps/app_info.dart';
 import '../../models/action_item.dart';
 import '../theme/app_theme.dart';
+import '../widgets/pc_app_picker_sheet.dart';
 
 /// Full-page action picker - Samsung style categorized list
 class ActionPickerScreen extends StatelessWidget {
@@ -464,9 +465,12 @@ class _PcActionsPage extends StatelessWidget {
         // ── Apps & Commands ──
         _sectionLabel('APPS & COMMANDS'),
         const SizedBox(height: 8),
-        _TextInputItem(icon: Icons.launch_rounded, color: AppColors.accentBlue,
-            title: 'Launch app', hint: 'App name or path (e.g. code, chrome)',
-            actionType: 'launchApp', paramKey: 'path', target: ActionTarget.pc),
+        _ActionItem(icon: Icons.launch_rounded, color: AppColors.accentBlue,
+            title: 'Launch app', subtitle: 'Pick from presets or open a folder in VS Code',
+            onTap: (ctx) async {
+              final item = await PcAppPickerSheet.show(ctx);
+              if (item != null && ctx.mounted) Navigator.pop(ctx, item);
+            }),
         _TextInputItem(icon: Icons.folder_open_rounded, color: AppColors.warning,
             title: 'Open file or folder', hint: 'C:\\Path\\to\\file-or-folder',
             actionType: 'openPath', paramKey: 'path', target: ActionTarget.pc),

@@ -1,0 +1,19 @@
+NFCC 1.1.0 — Write your own tags + robust reconnect
+
+• Tracker / TODO cards now have a Write button. Writes
+  NFCC_T:<id> / NFCC_D:<id> as NDEF so a fresh install on
+  another phone auto-pairs the same physical tag.
+• Auto-reconnect survives WiFi hops and DHCP renewals —
+  every 3rd reconnect attempt broadcasts UDP discovery and
+  updates the stored PC IP/port if it moved.
+• Rich "Launch PC App" picker: 22 presets (VS Code, Chrome,
+  Terminal, Explorer, Office, …) plus an optional target
+  field so one tap can open a specific folder in VS Code
+  or a URL in Chrome.
+• Samsung-Reminder-style time field on daily TODOs.
+• New app icon + favicons across every surface.
+• Better UPI payment sheet with branded app logos.
+• Fixes icon rendering on web preview.
+• Companion app: NFCC-PC terminal command, port fallback
+  (9876–9886), UPnP forwarding, autostart on Windows login,
+  optional reconnect from tray and CLI.

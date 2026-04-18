@@ -341,6 +341,29 @@ def cmd_unforward(args) -> int:
     return 0 if ok else 1
 
 
+def cmd_autostart(args) -> int:
+    """Enable / disable / check Windows auto-start on login."""
+    try:
+        import autostart
+    except ImportError:
+        print("error: autostart is Windows-only", file=sys.stderr)
+        return 1
+    if args.action == "enable":
+        autostart.enable_autostart()
+        print(f"autostart enabled — runs on login from: {autostart.get_exe_path()}")
+        return 0
+    if args.action == "disable":
+        autostart.disable_autostart()
+        print("autostart disabled")
+        return 0
+    # status (default)
+    enabled = autostart.is_autostart_enabled()
+    print(f"enabled:    {enabled}")
+    print(f"executable: {autostart.get_exe_path()}")
+    print(f"registry:   HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\NFCC")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="NFCC-PC",
@@ -372,6 +395,11 @@ def build_parser() -> argparse.ArgumentParser:
     pa.add_argument("name", help="action name, e.g. lockPc, launchApp, volumeUp")
     pa.add_argument("--params", help="JSON object of parameters, e.g. '{\"name\":\"notepad\"}'")
     pa.set_defaults(func=cmd_action)
+
+    pas = sub.add_parser("autostart", help="manage Windows auto-start on login")
+    pas.add_argument("action", nargs="?", default="status",
+                     choices=["enable", "disable", "status"])
+    pas.set_defaults(func=cmd_autostart)
 
     return p
 

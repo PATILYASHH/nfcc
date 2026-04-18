@@ -59,7 +59,21 @@ Write common payloads to a tag:
 - UPI payment (PhonePe / GPay / Paytm / BHIM / Amazon Pay)
 - Business card (coming soon)
 
-Writing an automation or routine stores `NFCC:<id>` as an NDEF record. Any NFCC install can resolve it.
+Writing from within the app stores an NDEF handle:
+- `NFCC:<id>` — routine
+- `NFCC_T:<id>` — tracker (from the **Write** chip on a tracker card)
+- `NFCC_D:<id>` — TODO (from the **Write** chip on a TODO card)
+
+A fresh install that imports the same tracker/TODO/routine by id will auto-pair the physical tag on its first tap.
+
+## Launch PC App (action editor)
+
+Picking **Launch app** in the PC action picker opens a rich picker sheet:
+- **Presets** — VS Code, Cursor, Sublime, Notepad, Chrome / Edge / Firefox, Windows Terminal / PowerShell / cmd, File Explorer, Calculator, Paint, Settings, Discord, Telegram, WhatsApp, Spotify, Word, Excel, Outlook, Teams, Tally.
+- **Target (optional)** — for apps that accept one (IDEs, browsers, file manager, Office), a second field lets you paste a folder path, file path, or URL. That's passed as argv[1], so `VS Code` + `C:\code\myrepo` is the exact equivalent of running `code C:\code\myrepo` on the PC.
+- **Custom** — if your app isn't in the presets, drop in an alias (e.g. `obsidian`) or a full `.exe` path and optionally a target.
+
+On the PC side this calls the companion's `launch_app` action, which resolves the alias through `APP_ALIASES` (extend in [nfcc_pc/actions/apps.py](../nfcc_pc/actions/apps.py)) and runs the app with the target as its first argument.
 
 ## Troubleshooting
 

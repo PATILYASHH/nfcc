@@ -38,13 +38,36 @@ APP_ALIASES = {
 
 
 def launch_app(params: dict) -> ActionResult:
+    """Launch an app, optionally passing a file/folder as its argument.
+
+    params:
+      name    — friendly alias (see APP_ALIASES) or any executable on PATH
+      path    — full path to an .exe (takes precedence over name)
+      target  — optional file/folder passed as argument to the app, e.g.
+                name=vscode + target=C:\\repo  →  runs `code C:\\repo`
+                name=chrome + target=https://… →  opens the URL in Chrome
+    """
     path = (params.get("path") or "").strip()
     name = (params.get("name") or "").strip().lower()
-    target = path or APP_ALIASES.get(name, name)
-    if not target:
+    target = (params.get("target") or "").strip()
+    app_cmd = path or APP_ALIASES.get(name, name)
+    if not app_cmd:
         return fail("No path or name provided")
-    subprocess.Popen(["cmd", "/c", "start", "", target], shell=False)
-    return ok(f"Launched: {target}")
+
+    if target:
+        # Direct exec so the app receives `target` as argv[1].
+        try:
+            subprocess.Popen([app_cmd, target])
+            return ok(f"Launched: {app_cmd} {target}")
+        except (FileNotFoundError, OSError):
+            # Fall through to shell lookup.
+            subprocess.Popen(
+                ["cmd", "/c", "start", "", app_cmd, target], shell=False
+            )
+            return ok(f"Launched: {app_cmd} {target}")
+
+    subprocess.Popen(["cmd", "/c", "start", "", app_cmd], shell=False)
+    return ok(f"Launched: {app_cmd}")
 
 
 def close_app(params: dict) -> ActionResult:
