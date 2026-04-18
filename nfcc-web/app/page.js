@@ -54,6 +54,11 @@ export default function Home() {
             <a href="#actions">Actions</a>
             <a href="#architecture">Architecture</a>
             <a href="#roadmap">Roadmap</a>
+            <a href="https://github.com/sponsors/PATILYASHH"
+               target="_blank" rel="noreferrer"
+               className="nav-sponsor">
+              <HeartIcon /> Sponsor
+            </a>
           </div>
           <a href="#download" className="nav-cta">
             Get the app
@@ -69,16 +74,16 @@ export default function Home() {
           <div>
             <div className="hero-badge reveal">
               <span className="dot" />
-              v1.0 · Released April 2026
+              v1.1.0 · Released April 2026
             </div>
             <h1 className="reveal d1">
               One Tap. <br />
-              <span className="accent">Infinite Automations.</span>
+              <span className="accent">Automate. Track. Tick off.</span>
             </h1>
             <p className="lede reveal d2">
-              Turn any NFC tag into a launcher for your entire workflow. NFC
-              Control evaluates time, Wi-Fi, and context — then fires precisely
-              the right actions across your phone and PC.
+              One NFC tap can fire a routine, log a glass of water, complete a
+              daily TODO, and launch a folder in VS Code on your PC —
+              all at once. Local-first, no cloud, no tracking.
             </p>
             <div className="cta-row reveal d3">
               <a href="#download" className="btn btn-primary">
@@ -105,9 +110,9 @@ export default function Home() {
         <div className="container">
           <div className="stats">
             <Stat num="60+" lbl="Actions" />
-            <Stat num="11" lbl="App Screens" />
-            <Stat num="2" lbl="Platforms Synced" />
-            <Stat num="< 1s" lbl="Tap to Trigger" />
+            <Stat num="3" lbl="Smart NFC Modes" />
+            <Stat num="0" lbl="Cloud Servers" />
+            <Stat num="MIT" lbl="License" />
           </div>
         </div>
       </section>
@@ -460,12 +465,38 @@ export default function Home() {
               <GithubIcon /> Source on GitHub
             </a>
             <a
-              href="https://patilyashh.github.io/nfcc/"
+              href="https://github.com/PATILYASHH/nfcc/releases/latest"
               target="_blank"
               rel="noreferrer"
               className="btn btn-ghost"
             >
-              <GlobeIcon /> Try the web preview
+              <DownloadIcon /> All releases
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ========== SPONSOR ========== */}
+      <section className="block" id="sponsor">
+        <div className="container">
+          <div className="sponsor-card reveal">
+            <div className="sponsor-ic"><HeartIcon /></div>
+            <div className="sponsor-copy">
+              <div className="eyebrow" style={{ marginBottom: 6 }}>Support the project</div>
+              <h3>Keep NFCC free & open-source.</h3>
+              <p>
+                NFCC is MIT, ad-free, tracker-free, and paid for out of pocket.
+                If it saves you time, a monthly sponsorship keeps the releases,
+                server costs, and F-Droid builds coming.
+              </p>
+            </div>
+            <a
+              href="https://github.com/sponsors/PATILYASHH"
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn-primary"
+            >
+              <HeartIcon /> Sponsor on GitHub
             </a>
           </div>
         </div>
@@ -485,6 +516,13 @@ export default function Home() {
             <a href="#how">How</a>
             <a href="#actions">Actions</a>
             <a href="#architecture">Architecture</a>
+            <a
+              href="https://github.com/sponsors/PATILYASHH"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Sponsor
+            </a>
           </div>
         </div>
       </footer>
@@ -496,58 +534,58 @@ export default function Home() {
 
 const FEATURES = [
   {
-    title: 'NFC Read & Write',
-    body: 'Full read/write/format support for NTAG213, 215, and 216 tags with protection options.',
+    title: 'Routines',
+    body: 'IF/ELSE automations over time, weekday, Wi-Fi SSID, and Bluetooth state. Chain phone + PC actions per branch.',
     color: '#00B0FF',
-    icon: <TagIcon />,
-  },
-  {
-    title: 'IF / ELSE Branches',
-    body: 'Condition engine evaluates time, weekday, Wi-Fi SSID, and Bluetooth state per tap.',
-    color: '#8B5CF6',
     icon: <BranchIcon />,
   },
   {
-    title: 'Cross-device Sync',
-    body: 'Pair your PC once over QR — all actions route over local Wi-Fi with auto-reconnect.',
+    title: 'Tracking',
+    body: 'Counters (water, coffee, calories) and state-aware IN / OUT toggles (home, office, gym). Goals, streaks, logs.',
     color: '#22D3EE',
-    icon: <LinkIcon />,
-  },
-  {
-    title: 'Offline-first SQLite',
-    body: 'Every tag, automation, and scan is stored locally. Zero cloud, zero account, zero lag.',
-    color: '#10B981',
-    icon: <DatabaseIcon />,
-  },
-  {
-    title: 'Scan Logs',
-    body: 'Every tap is logged with timestamp, branch taken, and outcome — perfect for debugging.',
-    color: '#F97316',
     icon: <LogIcon />,
   },
   {
-    title: 'Samsung-inspired UI',
-    body: 'Minimal black/white interface with soft motion, haptics, and one-handed ergonomics.',
-    color: '#EC4899',
+    title: 'TODOs',
+    body: 'Daily tasks with streak counters or one-off lists. Optional reminder time. Tap a paired tag to complete.',
+    color: '#8B5CF6',
     icon: <SparkIcon />,
   },
   {
-    title: 'Auto PC Discovery',
-    body: 'UDP broadcast finds your PC on the LAN automatically — no IPs, no port configs.',
+    title: 'One tag, many jobs',
+    body: 'A single tag can fire a routine, log multiple trackers, and tick off several TODOs in one tap.',
+    color: '#EC4899',
+    icon: <TagIcon />,
+  },
+  {
+    title: 'Write any NFC payload',
+    body: 'URL, Wi-Fi, SMS, email, phone, location (map picker), app launcher, UPI payment links — NTAG213/215/216.',
+    color: '#F97316',
+    icon: <ReorderIcon />,
+  },
+  {
+    title: 'Rich PC App Picker',
+    body: '22 preset PC apps (VS Code, Chrome, Terminal, Explorer, …). Pass a folder path to open it in VS Code on one tap.',
+    color: '#3B82F6',
+    icon: <LinkIcon />,
+  },
+  {
+    title: 'Auto PC reconnect',
+    body: 'Phone survives WiFi hops and DHCP renewals — UDP rediscovery refreshes the stored IP within seconds.',
     color: '#F59E0B',
     icon: <RadarIcon />,
   },
   {
-    title: 'Drag-to-reorder Actions',
-    body: 'Chain actions, tune delays, re-sequence steps — all with a smooth drag-and-drop editor.',
-    color: '#3B82F6',
-    icon: <ReorderIcon />,
-  },
-  {
-    title: 'System-tray Companion',
-    body: 'Tiny Python daemon runs in the tray with optional autostart — forget it, it just works.',
+    title: 'NFCC-PC terminal CLI',
+    body: 'One binary, status/pair/dashboard/reconnect/forward/action from any terminal. UPnP port forwarding included.',
     color: '#EF4444',
     icon: <TrayIcon />,
+  },
+  {
+    title: 'Local-first SQLite',
+    body: 'Every tag, log, TODO, and tracker lives on your device. No account, no analytics, no tracking — F-Droid ready.',
+    color: '#10B981',
+    icon: <DatabaseIcon />,
   },
 ];
 
@@ -640,13 +678,6 @@ const DOWNLOADS = [
     icon: <AppleIcon />,
   },
   {
-    name: 'Web preview',
-    file: 'patilyashh.github.io/nfcc',
-    color: '#8B5CF6',
-    href: 'https://patilyashh.github.io/nfcc/',
-    icon: <GlobeIcon />,
-  },
-  {
     name: 'macOS',
     file: 'coming soon',
     status: 'planned',
@@ -668,32 +699,44 @@ const PHASES = [
   {
     num: '01',
     status: 'done',
-    title: 'Foundation',
-    body: 'Flutter scaffold, Samsung theme, SQLite schema with 6 tables.',
+    title: 'Foundation · v1.0',
+    body: 'Flutter scaffold, Samsung theme, SQLite schema, NFC read/write/format.',
   },
   {
     num: '02',
     status: 'done',
-    title: 'NFC Core',
-    body: 'Read/write/format NTAG tags, UID matching, tag database.',
+    title: 'Automation Engine · v1.0',
+    body: 'IF/ELSE branches over time / weekday / Wi-Fi / Bluetooth. 28 phone actions.',
   },
   {
     num: '03',
     status: 'done',
-    title: 'Automation Engine',
-    body: 'IF/ELSE branches, condition evaluator, action sequencer.',
+    title: 'PC Companion · v1.0',
+    body: 'Python tray, WebSocket, 32 actions, UDP discovery, QR pair.',
   },
   {
     num: '04',
     status: 'done',
-    title: 'PC Companion',
-    body: 'Python tray, WebSocket, 32 actions, UDP discovery, QR pair.',
+    title: 'Smart NFC Hub · v1.1',
+    body: 'Routines + Tracking (counters + IN/OUT) + TODOs (streaks + reminder time).',
   },
   {
     num: '05',
+    status: 'done',
+    title: 'Cross-install tags · v1.1',
+    body: 'NFCC_T: / NFCC_D: NDEF so one physical tag re-pairs on any device.',
+  },
+  {
+    num: '06',
+    status: 'done',
+    title: 'PC CLI + UPnP · v1.1',
+    body: 'NFCC-PC terminal command, port fallback, auto-reconnect, UPnP forwarding.',
+  },
+  {
+    num: '07',
     status: 'active',
-    title: 'Polish & Release',
-    body: 'v1.0 UI polish, crash telemetry, release APK and installer.',
+    title: 'F-Droid launch',
+    body: 'RFP submitted. Build recipe with auto-update on tags. Next: store listing.',
   },
 ];
 
@@ -1041,6 +1084,14 @@ function LinuxIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
       <path d="M12 2c-2.2 0-4 2.5-4 6 0 1.4.3 2.6.8 3.5-.7.8-1.6 1.6-2.3 2.3-1 1.2-1.5 2.4-1.5 3.2 0 .6.3 1 .7 1.3.3.1.4.3.4.8 0 .6.3 1.1.8 1.4.4.2.7.5.9.9.3.6.8.9 1.6.9.5 0 1.1-.2 1.5-.5.4-.4.9-.5 1.4-.5s1 .1 1.4.5c.4.3 1 .5 1.5.5.8 0 1.3-.3 1.6-.9.2-.4.5-.7.9-.9.5-.3.8-.8.8-1.4 0-.5.1-.7.4-.8.4-.3.7-.7.7-1.3 0-.8-.5-2-1.5-3.2-.7-.7-1.6-1.5-2.3-2.3.5-.9.8-2.1.8-3.5 0-3.5-1.8-6-4-6Zm-1.5 4.5c.3 0 .6.4.6 1s-.3 1-.6 1-.6-.4-.6-1 .3-1 .6-1Zm3 0c.3 0 .6.4.6 1s-.3 1-.6 1-.6-.4-.6-1 .3-1 .6-1Z"/>
+    </svg>
+  );
+}
+
+function HeartIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6C19 16.5 12 21 12 21Z" />
     </svg>
   );
 }
