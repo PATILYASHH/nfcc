@@ -267,9 +267,57 @@ def cmd_action(args) -> int:
 
 def cmd_dashboard(args) -> int:
     url = "http://localhost:8877"
+    # If the tray service isn't up, bring it up first. The dashboard
+    # HTTP server lives inside the tray process — it keeps running
+    # forever, independent of whether any browser tab is open — so a
+    # single `NFCC-PC serve` is enough to answer every future
+    # `NFCC-PC dashboard` / `NFCC-PC` launch.
+    if not _is_service_running():
+        print("NFCC-PC: no service detected on :8877, starting one in the background…")
+        # Spawn serve as a detached background process so the terminal
+        # returns immediately and the tray service survives this shell.
+        _spawn_serve_detached()
+        # Give it a moment to bind the port so the browser lands on a
+        # working page rather than a connection-refused error.
+        _wait_for_service(timeout_s=8)
     webbrowser.open(url)
-    print(f"Opened {url}  (the dashboard only answers when `NFCC-PC serve` is running)")
+    print(f"Opened {url}")
     return 0
+
+
+def _spawn_serve_detached() -> None:
+    """Launch `NFCC-PC serve` as a detached background process.
+    - Frozen: call the same EXE with `serve` arg.
+    - Source: call pythonw.exe so no console window is attached.
+    """
+    import subprocess
+    if getattr(sys, "frozen", False):
+        exe = sys.executable
+        args = [exe, "serve"]
+    else:
+        import os, shutil
+        pythonw = shutil.which("pythonw") or os.path.join(
+            os.path.dirname(sys.executable), "pythonw.exe"
+        )
+        main_py = os.path.abspath(sys.argv[0])
+        args = [pythonw, main_py, "serve"]
+    # On Windows, DETACHED_PROCESS + CREATE_NEW_PROCESS_GROUP makes the
+    # child independent of this console so closing the cmd window we
+    # spawned from doesn't take it down.
+    DETACHED = 0x00000008
+    NEW_PGROUP = 0x00000200
+    creationflags = DETACHED | NEW_PGROUP if sys.platform == "win32" else 0
+    subprocess.Popen(args, close_fds=True, creationflags=creationflags)
+
+
+def _wait_for_service(timeout_s: float = 8.0) -> bool:
+    import time
+    deadline = time.monotonic() + timeout_s
+    while time.monotonic() < deadline:
+        if _is_service_running():
+            return True
+        time.sleep(0.25)
+    return False
 
 
 def cmd_serve(args) -> int:
@@ -418,17 +466,13 @@ def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
 
-    # Bare `NFCC-PC` in a terminal opens the dashboard — treating the
-    # local webpage as the GUI of the companion. If the tray service is
-    # already running (e.g. from autostart) we just point the browser at
-    # it; otherwise we start `serve` AND auto-open the browser so the
-    # first run feels like "type the name, see the app".
+    # Bare `NFCC-PC` in a terminal = open the dashboard (the webpage IS
+    # the GUI). cmd_dashboard handles "start the service if it isn't up
+    # yet" transparently, so users can just type the command and always
+    # get a working page — regardless of whether autostart put a tray
+    # service in place, and regardless of whether the browser is open.
     if args.cmd is None:
-        if _is_service_running():
-            cmd_dashboard(argparse.Namespace())
-            return
-        print("NFCC-PC: no service detected on :8877, starting one…")
-        cmd_serve(argparse.Namespace(open_browser=True))
+        sys.exit(cmd_dashboard(argparse.Namespace()))
         return
 
     sys.exit(args.func(args))
