@@ -89,6 +89,7 @@ npm install && npm run dev
 
 - [Architecture overview](docs/ARCHITECTURE.md) — how phone, PC, and tag talk to each other
 - [User guide](docs/USER_GUIDE.md) — routines, tracking, TODOs, tag pairing
+- [PC companion networking](docs/PC_COMPANION.md) — ports, reconnect, firewall, VPN
 - [NFC data format](docs/NFC_DATA_FORMAT.md) — what's written to a tag
 - [Android permissions rationale](docs/PERMISSIONS.md) — every permission justified + anti-features declaration
 - [Dependency audit (FOSS SBOM)](docs/DEPENDENCIES.md) — every package + license

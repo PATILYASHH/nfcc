@@ -128,22 +128,71 @@ class PcConnectionService extends ChangeNotifier {
     _errorMessage = reason;
     _setState(PcConnectionState.disconnected);
 
-    // Auto-reconnect: fast burst (10 tries), then slow retry (every 60s)
-    if (_currentPc != null) {
-      _reconnectTimer?.cancel();
-      if (_reconnectAttempts < 10) {
-        final delay = Duration(
-            seconds: [1, 2, 4, 8, 15, 30][_reconnectAttempts.clamp(0, 5)]);
-        _reconnectAttempts++;
-        _reconnectTimer = Timer(delay, () => _connect());
-      } else {
-        // Slow retry indefinitely
-        _reconnectTimer = Timer(const Duration(seconds: 60), () {
-          _reconnectAttempts = 5;
-          _connect();
-        });
+    if (_currentPc == null) return;
+
+    _reconnectTimer?.cancel();
+    final delay = _reconnectDelay(_reconnectAttempts);
+    _reconnectTimer = Timer(delay, () async {
+      // Every 3rd attempt (and always after 10+), re-run UDP discovery
+      // to pick up a new IP/port — handles WiFi changes + DHCP renewal.
+      if (_reconnectAttempts > 0 && _reconnectAttempts % 3 == 0) {
+        await _rediscoverAndUpdate();
+      }
+      _reconnectAttempts++;
+      _connect();
+    });
+  }
+
+  Duration _reconnectDelay(int attempts) {
+    // Fast at first, then back off up to 60 s.
+    const seconds = [1, 2, 4, 8, 15, 30, 45, 60];
+    return Duration(seconds: seconds[attempts.clamp(0, seconds.length - 1)]);
+  }
+
+  /// Broadcast a UDP discover packet and, if a PC with the same pairing
+  /// token responds, update the stored IP/port. Called periodically by
+  /// the reconnect loop and publicly via [refreshConnection].
+  Future<void> _rediscoverAndUpdate() async {
+    if (_currentPc == null) return;
+    debugPrint('NFCC: rediscovering PC (current IP ${_currentPc!.ip}:${_currentPc!.port})');
+    final found = await discoverPcs(timeout: const Duration(seconds: 3));
+    for (final pc in found) {
+      if (pc['token'] == _currentPc!.pairingToken) {
+        final newIp = pc['ip'] as String?;
+        final newPort = (pc['port'] as num?)?.toInt();
+        if (newIp == null || newPort == null) break;
+        if (newIp == _currentPc!.ip && newPort == _currentPc!.port) {
+          debugPrint('NFCC: rediscovery confirmed same endpoint');
+          break;
+        }
+        debugPrint('NFCC: PC moved to $newIp:$newPort — updating stored pairing');
+        _currentPc = PairedPc(
+          id: _currentPc!.id,
+          name: (pc['name'] as String?) ?? _currentPc!.name,
+          ip: newIp,
+          port: newPort,
+          pairingToken: _currentPc!.pairingToken,
+          pairedAt: _currentPc!.pairedAt,
+        );
+        await _db.insertPairedPc(_currentPc!); // upsert on id
+        break;
       }
     }
+  }
+
+  /// Manually force a rediscovery + reconnect — e.g. after the user
+  /// changed WiFi networks or restarted the PC companion.
+  Future<void> refreshConnection() async {
+    if (_currentPc == null) return;
+    _reconnectTimer?.cancel();
+    _pingTimer?.cancel();
+    try {
+      _channel?.sink.close();
+    } catch (_) {}
+    _channel = null;
+    _reconnectAttempts = 0;
+    await _rediscoverAndUpdate();
+    await _connect();
   }
 
   /// Send a PC action and wait for result

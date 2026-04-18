@@ -10,6 +10,7 @@ import websockets
 from websockets.asyncio.server import ServerConnection
 
 from action_executor import execute_action
+from config import save_config
 from models import ActionMessage, ActionResult, AuthResult, parse_message
 
 logger = logging.getLogger("nfcc")
@@ -26,11 +27,31 @@ class NfccWebSocketServer:
         self._authenticated_clients: Set[ServerConnection] = set()
 
     async def start(self):
-        self._server = await websockets.serve(
-            self._handle_client,
-            "0.0.0.0",
-            self.port,
-        )
+        # Try the configured port first; if taken, walk forward up to +10.
+        # Whichever port actually binds is written back into self.config
+        # so the discovery responder advertises the right one.
+        configured = self.port
+        last_error: Exception | None = None
+        for candidate in range(configured, configured + 11):
+            try:
+                self._server = await websockets.serve(
+                    self._handle_client,
+                    "0.0.0.0",
+                    candidate,
+                )
+                self.port = candidate
+                if self.config.get("port") != candidate:
+                    self.config["port"] = candidate
+                    save_config(self.config)
+                break
+            except OSError as e:
+                last_error = e
+                logger.warning(f"Port {candidate} unavailable, trying next")
+                continue
+        else:
+            raise RuntimeError(
+                f"Could not bind any port in {configured}-{configured + 10}: {last_error}"
+            )
         logger.info(f"WebSocket server running on port {self.port}")
         if self.on_status_change:
             self.on_status_change(f"Listening on port {self.port}")
