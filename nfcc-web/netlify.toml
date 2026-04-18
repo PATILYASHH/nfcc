@@ -1,0 +1,27 @@
+# Netlify configuration for the NFCC landing page (nfcc-web).
+#
+# The repo root contains three sub-projects (nfcc-web, nfcc_mobile, nfcc_pc);
+# this file only covers the Next.js landing page. Point Netlify at this
+# folder as the "Base directory" when linking the site.
+
+[build]
+  base = "nfcc-web"
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # Business-card routes require a KV store; until we wire @netlify/blobs,
+  # skip them at runtime instead of crashing the build.
+  NEXT_PUBLIC_BUSINESS_CARDS_DISABLED = "1"
+
+# Netlify auto-injects @netlify/plugin-nextjs for Next.js projects, which
+# gives us app-router route handlers + ISR + edge functions out of the box.
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"

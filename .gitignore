@@ -133,3 +133,6 @@ nfcc_mobile/**/*.dex
 # (gradle-wrapper.jar lives under android/gradle/wrapper/ — that one is
 #  intentionally excluded from commits via the standard Flutter .gitignore
 #  inside nfcc_mobile/android/.)
+
+# Local Netlify folder
+.netlify
