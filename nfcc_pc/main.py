@@ -286,28 +286,69 @@ def cmd_dashboard(args) -> int:
 
 
 def _spawn_serve_detached() -> None:
-    """Launch `NFCC-PC serve` as a detached background process.
-    - Frozen: call the same EXE with `serve` arg.
-    - Source: call pythonw.exe so no console window is attached.
+    """Launch `NFCC-PC serve` as a **fully detached** background process.
+
+    The child must survive:
+      * the cmd window that ran `NFCC-PC`
+      * the browser tab that was auto-opened
+      * the parent Python interpreter exiting
+
+    On Windows the only way to guarantee that is:
+      1. Use pythonw.exe (or the frozen --windowed .exe) — no console
+         at all, so there's no console handle to inherit.
+      2. Clear every std stream via DEVNULL so even accidental handle
+         inheritance can't tie it to the parent.
+      3. Combine DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP |
+         CREATE_BREAKAWAY_FROM_JOB — the last one is critical, because
+         terminals (cmd.exe, Windows Terminal) place children in a Job
+         Object that kills them all when the terminal closes unless
+         BREAKAWAY_FROM_JOB is set.
+      4. Set cwd to a stable absolute path so config lookups don't
+         depend on where NFCC-PC was invoked from.
     """
-    import subprocess
+    import os, shutil, subprocess
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+
     if getattr(sys, "frozen", False):
-        exe = sys.executable
-        args = [exe, "serve"]
+        args = [sys.executable, "serve"]
     else:
-        import os, shutil
         pythonw = shutil.which("pythonw") or os.path.join(
             os.path.dirname(sys.executable), "pythonw.exe"
         )
-        main_py = os.path.abspath(sys.argv[0])
+        main_py = os.path.abspath(__file__)
         args = [pythonw, main_py, "serve"]
-    # On Windows, DETACHED_PROCESS + CREATE_NEW_PROCESS_GROUP makes the
-    # child independent of this console so closing the cmd window we
-    # spawned from doesn't take it down.
-    DETACHED = 0x00000008
-    NEW_PGROUP = 0x00000200
-    creationflags = DETACHED | NEW_PGROUP if sys.platform == "win32" else 0
-    subprocess.Popen(args, close_fds=True, creationflags=creationflags)
+
+    DETACHED_PROCESS = 0x00000008
+    CREATE_NEW_PROCESS_GROUP = 0x00000200
+    CREATE_BREAKAWAY_FROM_JOB = 0x01000000
+    CREATE_NO_WINDOW = 0x08000000
+
+    if sys.platform == "win32":
+        creationflags = (
+            DETACHED_PROCESS
+            | CREATE_NEW_PROCESS_GROUP
+            | CREATE_BREAKAWAY_FROM_JOB
+            | CREATE_NO_WINDOW
+        )
+        subprocess.Popen(
+            args,
+            cwd=script_dir,
+            close_fds=True,
+            creationflags=creationflags,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    else:
+        subprocess.Popen(
+            args,
+            cwd=script_dir,
+            close_fds=True,
+            start_new_session=True,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
 
 
 def _wait_for_service(timeout_s: float = 8.0) -> bool:
@@ -389,6 +430,55 @@ def cmd_unforward(args) -> int:
     return 0 if ok else 1
 
 
+def cmd_health(args) -> int:
+    """One-glance diagnostic: is everything that needs to be up actually up?"""
+    import urllib.request
+    checks = []
+
+    # 1. Dashboard HTTP
+    try:
+        with urllib.request.urlopen("http://localhost:8877/api/status", timeout=1) as r:
+            data = json.loads(r.read())
+        checks.append(("service", True,
+                       f"answering on :8877 — {data.get('devices', 0)} device(s), "
+                       f"{data.get('action_count', 0)} action(s) since start"))
+    except Exception as e:
+        checks.append(("service", False, f"NO ANSWER on :8877 ({e})"))
+
+    # 2. WebSocket bound
+    import socket as _s
+    try:
+        t = _s.socket()
+        t.settimeout(0.5)
+        config = load_config()
+        t.connect(("127.0.0.1", config["port"]))
+        t.close()
+        checks.append(("websocket", True, f"listening on :{config['port']}"))
+    except Exception as e:
+        checks.append(("websocket", False, f"NOT listening ({e})"))
+
+    # 3. Autostart
+    try:
+        import autostart
+        ok = autostart.is_autostart_enabled()
+        checks.append(("autostart", ok,
+                       "registered in HKCU\\…\\Run" if ok else "NOT registered"))
+    except Exception as e:
+        checks.append(("autostart", False, str(e)))
+
+    # Print a neat table
+    all_ok = all(ok for _, ok, _ in checks)
+    for name, ok, detail in checks:
+        mark = "OK  " if ok else "FAIL"
+        print(f"  [{mark}] {name:10s} {detail}")
+    print()
+    if all_ok:
+        print("  All systems go. Closing browsers does NOT affect the service.")
+    else:
+        print("  Start the service with:  NFCC-PC   (or NFCC-PC serve for headless)")
+    return 0 if all_ok else 1
+
+
 def cmd_autostart(args) -> int:
     """Enable / disable / check Windows auto-start on login."""
     try:
@@ -448,6 +538,8 @@ def build_parser() -> argparse.ArgumentParser:
     pas.add_argument("action", nargs="?", default="status",
                      choices=["enable", "disable", "status"])
     pas.set_defaults(func=cmd_autostart)
+
+    sub.add_parser("health", help="is the service answering? is autostart on?").set_defaults(func=cmd_health)
 
     return p
 
