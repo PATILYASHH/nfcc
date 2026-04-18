@@ -1,6 +1,45 @@
-# PC Companion — networking & reconnect
+# PC Companion — networking, reconnect, CLI
 
 The PC companion (`nfcc_pc`) and phone talk over **your local Wi-Fi only**. Nothing leaves the LAN — no cloud relay, no account.
+
+## Running modes
+
+The companion is three things in one process:
+
+1. **Tray service** — the background WebSocket + UDP discovery. This is what the phone actually talks to. **Only the tray icon keeps the process alive.** Closing the browser, the dashboard, or the terminal you launched from does **not** stop it.
+2. **Local dashboard** at `http://localhost:8877` — a pure frontend. Open it from the tray when you want to see status, pairing QR, and the action log. Close the tab any time — the service keeps running.
+3. **CLI** — a small `nfcc` command for terminals and scripts.
+
+### Start headless (recommended)
+
+Windows — double-click `start-background.bat` (ships in `nfcc_pc/`). It calls `pythonw.exe` which has no console window, so there's nothing to accidentally close.
+
+Or the built `NFCC-Companion.exe` (from the release page) is compiled with PyInstaller `--windowed` — same effect.
+
+### Start from a terminal (development)
+
+```
+python main.py            # = python main.py serve
+python main.py serve      # foreground, Ctrl+C to stop
+```
+
+The tray icon is still what keeps it alive in this mode too; the terminal is only there for logs.
+
+### CLI
+
+```
+nfcc                                # same as `nfcc serve`
+nfcc serve [--open-browser]         # start the tray service
+nfcc status                         # print config + IP + port
+nfcc pair                           # print pairing JSON for copy/paste
+nfcc dashboard                      # open the dashboard in the browser
+nfcc action lockPc                  # execute a PC action locally, no network
+nfcc action launchApp --params '{"name":"notepad"}'
+```
+
+`nfcc action` is handy for scripts, scheduled tasks, and debugging without involving the phone at all. Add `nfcc_pc/` (or the folder containing `nfcc.bat`) to your `PATH` to call it from anywhere.
+
+
 
 ## The two ports
 
