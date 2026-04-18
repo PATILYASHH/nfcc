@@ -93,9 +93,37 @@ Builds:
     output: build/app/outputs/flutter-apk/app-release.apk
     novcheck: true
 
+  - versionName: 1.2.0
+    versionCode: 3
+    commit: v1.2.0
+    subdir: nfcc_mobile
+    sudo:
+      - apt-get update
+      - apt-get install -y openjdk-17-jdk-headless
+      - update-java-alternatives -a
+    gradle:
+      - yes
+    srclibs:
+      - flutter@3.38.9
+    rm:
+      - nfcc_mobile/ios
+      - nfcc_mobile/macos
+      - nfcc_mobile/windows
+      - nfcc_mobile/linux
+      - nfcc_mobile/web
+    prebuild:
+      - export PUB_CACHE="$$PWD$$/.pub-cache"
+      - $$flutter$$/bin/flutter config --no-analytics
+      - $$flutter$$/bin/flutter pub get
+    build:
+      - export PUB_CACHE="$$PWD$$/.pub-cache"
+      - $$flutter$$/bin/flutter build apk --release --no-tree-shake-icons
+    output: build/app/outputs/flutter-apk/app-release.apk
+    novcheck: true
+
 # Auto-pick up new releases tagged `vX.Y.Z` on the GitHub repo.
 AutoUpdateMode: Version v%v
 UpdateCheckMode: Tags ^v[0-9]+\.[0-9]+\.[0-9]+$
 UpdateCheckData: nfcc_mobile/pubspec.yaml|^version:\s*(\d+\.\d+\.\d+)\+.*$|^|^version:\s*\d+\.\d+\.\d+\+(\d+)$
-CurrentVersion: 1.1.0
-CurrentVersionCode: 2
+CurrentVersion: 1.2.0
+CurrentVersionCode: 3

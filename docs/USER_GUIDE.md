@@ -16,11 +16,21 @@ Grab the APK from [Releases](https://github.com/PATILYASHH/nfcc/releases/latest)
 
 ## Pairing phone ↔ PC
 
-1. Launch the PC companion. Right-click its tray icon → **Show QR**.
-2. On phone: **Settings → Pair PC → Scan QR**.
+1. Launch the PC companion. Right-click its tray icon → **Open Dashboard…** (or type `NFCC-PC` in any terminal).
+2. On phone: **Settings → Pair PC → Scan QR** using the QR on the dashboard.
 3. Or: on the same Wi-Fi, **Settings → Pair PC → Auto-discover**.
 
 Pairing stores a token locally; no cloud account.
+
+Since v1.2.0 the phone **auto-reconnects to the last paired PC** every time the app launches. Pair once, then just use the app — the tray icon goes green within a couple of seconds of opening NFCC. If the PC moves to a new IP (DHCP renewal, different Wi-Fi), the phone's background rediscovery picks it up automatically.
+
+On the PC side, run `NFCC-PC health` any time to verify the service is actually alive:
+
+```
+[OK  ] service    answering on :8877 — 1 device(s) connected
+[OK  ] websocket  listening on :9876
+[OK  ] autostart  registered in HKCU\…\Run
+```
 
 ## Smart NFC tab
 

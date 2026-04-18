@@ -1,0 +1,18 @@
+NFCC 1.2.0 — Pair once, stay paired
+
+• Auto-reconnect to the last paired PC on every app launch — no
+  re-pairing after reboot, WiFi hop, or DHCP renewal.
+• Fixed multi-NIC PCs: discovery now replies with the IP of the
+  interface the phone's packet arrived on, not a random Ethernet/
+  Wi-Fi guess. No more "found but unreachable" pairings.
+• PC companion runs bulletproof in the background. Closing the
+  browser tab, terminal, or dashboard never kills the service.
+• New `NFCC-PC` command in any Windows terminal opens the control
+  panel. Auto-starts the service if it wasn't running.
+• New `NFCC-PC health` prints a one-shot diagnostic.
+• Silent Windows autostart via pythonw — no cmd window flash at
+  boot.
+• Landing page (nfcc-patilyashh.netlify.app) refreshed with the
+  current feature set + GitHub Sponsors link.
+• F-Droid compliance: metadata at repo root, Gradle SHA-256
+  pinned, lock files committed, real phone screenshots included.

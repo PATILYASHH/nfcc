@@ -74,7 +74,7 @@ export default function Home() {
           <div>
             <div className="hero-badge reveal">
               <span className="dot" />
-              v1.1.0 · Released April 2026
+              v1.2.0 · Released April 2026
             </div>
             <h1 className="reveal d1">
               One Tap. <br />
@@ -734,6 +734,12 @@ const PHASES = [
   },
   {
     num: '07',
+    status: 'done',
+    title: 'Pair once, stay paired · v1.2',
+    body: 'Auto-reconnect on launch, multi-NIC discovery fix, bulletproof service detach, NFCC-PC health.',
+  },
+  {
+    num: '08',
     status: 'active',
     title: 'F-Droid launch',
     body: 'RFP submitted. Build recipe with auto-update on tags. Next: store listing.',

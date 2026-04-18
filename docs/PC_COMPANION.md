@@ -39,9 +39,12 @@ NFCC-PC reconnect                      # tell the running service to restart its
 NFCC-PC forward [--port N]             # open the port on your router via UPnP
 NFCC-PC unforward [--port N]           # remove the UPnP port mapping
 NFCC-PC autostart enable|disable|status
+NFCC-PC health                         # one-shot diagnostic: service / ws / autostart
 NFCC-PC action lockPc                  # execute a PC action locally, no network
 NFCC-PC action launchApp --params '{"name":"notepad"}'
 ```
+
+- **`NFCC-PC health`** prints a tick-box summary of every piece that needs to be up, plus the current device + action counts. Run it any time you're unsure whether the service is really running — it's fully offline and doesn't touch the phone.
 
 - **Bare `NFCC-PC`** treats the local webpage as the GUI. If the tray service is already running (typical, because of autostart), it just opens `http://localhost:8877` in your default browser. If no service is running, it starts `serve` first and opens the browser as soon as the dashboard is up. Type the name, see the app — no arguments needed for everyday use.
 
