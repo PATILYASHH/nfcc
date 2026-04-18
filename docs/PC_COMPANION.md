@@ -30,17 +30,20 @@ The tray icon is still what keeps it alive in this mode too; the terminal is onl
 Add `nfcc_pc/` to your `PATH` and you can run from any directory in any terminal:
 
 ```
-NFCC-PC                                # same as `NFCC-PC serve`
-NFCC-PC serve [--open-browser]         # start the tray service
+NFCC-PC                                # open the dashboard (the webpage IS the GUI)
+NFCC-PC serve [--open-browser]         # start the tray service headless
 NFCC-PC status                         # print config + IP + port
 NFCC-PC pair                           # print pairing JSON for copy/paste
 NFCC-PC dashboard                      # open the dashboard in the browser
 NFCC-PC reconnect                      # tell the running service to restart its network services
 NFCC-PC forward [--port N]             # open the port on your router via UPnP
 NFCC-PC unforward [--port N]           # remove the UPnP port mapping
+NFCC-PC autostart enable|disable|status
 NFCC-PC action lockPc                  # execute a PC action locally, no network
 NFCC-PC action launchApp --params '{"name":"notepad"}'
 ```
+
+- **Bare `NFCC-PC`** treats the local webpage as the GUI. If the tray service is already running (typical, because of autostart), it just opens `http://localhost:8877` in your default browser. If no service is running, it starts `serve` first and opens the browser as soon as the dashboard is up. Type the name, see the app — no arguments needed for everyday use.
 
 - **`NFCC-PC reconnect`** hits `POST http://localhost:8877/api/reconnect` on the already-running tray service. It stops and restarts the WebSocket server + UDP discovery in-place, which rebinds ports (picking up the port-fallback range) and re-announces to phones. Paired phones auto-re-authenticate within a few seconds.
 - **`NFCC-PC forward`** uses UPnP (IGD v1/v2) to ask the router to open the current port. Works on routers with UPnP enabled — most consumer routers, many ISPs have disabled it. See the next section.

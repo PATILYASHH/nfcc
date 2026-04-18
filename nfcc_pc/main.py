@@ -404,13 +404,31 @@ def build_parser() -> argparse.ArgumentParser:
     return p
 
 
+def _is_service_running() -> bool:
+    """True if another `NFCC-PC serve` is already answering on :8877."""
+    import urllib.request
+    try:
+        urllib.request.urlopen("http://localhost:8877/api/status", timeout=1)
+        return True
+    except Exception:
+        return False
+
+
 def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
 
-    # Default to `serve` so double-clicking / pythonw launches the tray.
+    # Bare `NFCC-PC` in a terminal opens the dashboard — treating the
+    # local webpage as the GUI of the companion. If the tray service is
+    # already running (e.g. from autostart) we just point the browser at
+    # it; otherwise we start `serve` AND auto-open the browser so the
+    # first run feels like "type the name, see the app".
     if args.cmd is None:
-        cmd_serve(argparse.Namespace(open_browser=False))
+        if _is_service_running():
+            cmd_dashboard(argparse.Namespace())
+            return
+        print("NFCC-PC: no service detected on :8877, starting one…")
+        cmd_serve(argparse.Namespace(open_browser=True))
         return
 
     sys.exit(args.func(args))
